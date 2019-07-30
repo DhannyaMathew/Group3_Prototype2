@@ -36,30 +36,38 @@ public class Player : MonoBehaviour
     {
         private readonly Player _player;
         private readonly bool _forward;
-        private Vector2Int newPos;
-        private Vector2Int oldPos;
 
         public MoveAction(Player player, bool forward)
         {
             _forward = forward;
             _player = player;
-            oldPos = _player._position;
-            newPos = _player._position + _player._direction * (_forward ? 1 : -1);
-        }
-
-        public override string ToString()
-        {
-            return "Move action: " + oldPos + " -> " + newPos;
         }
 
         protected override bool CanPerform()
         {
-            var val = Level.IsWalkable(newPos);
+            var val = Level.IsWalkable(_player._position + _player._direction * (_forward ? 1 : -1));
             return val;
         }
 
         protected override void Perform()
         {
+            if (_forward)
+            {
+                var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
+                if (sausage != null)
+                {
+                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
+                }
+            }
+            else
+            {
+                var sausage = Level.CheckForSausage(_player._position - _player._direction);
+                if (sausage != null)
+                {
+                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction * -1));
+                }
+            }
+
             _player.Move(_forward);
         }
 
@@ -69,7 +77,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void GetBurned(bool inverse, bool isUndo)
+    private void GetBurnt(bool inverse, bool isUndo)
     {
         _onGrill = true;
         _inverse = inverse;
@@ -98,26 +106,16 @@ public class Player : MonoBehaviour
         if (_timer <= 0)
         {
             if (Input.GetButton("Right"))
-            {
                 CalculateMove(Vector2Int.right);
-            }
             else if (Input.GetButton("Left"))
-            {
                 CalculateMove(Vector2Int.left);
-            }
             else if (Input.GetButton("Up"))
-            {
                 CalculateMove(Vector2Int.up);
-            }
             else if (Input.GetButton("Down"))
-            {
                 CalculateMove(Vector2Int.down);
-            }
         }
         else
-        {
             _timer -= Time.deltaTime;
-        }
     }
 
     private void CalculateMove(Vector2Int input)
@@ -137,7 +135,7 @@ public class Player : MonoBehaviour
         _position += _direction * (forward ? 1 : -1);
         if (Level.IsGrill(_position))
         {
-            GetBurned(!forward, isUndo);
+            GetBurnt(!forward, isUndo);
         }
     }
 
@@ -168,7 +166,6 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
 
         var rot = Quaternion.LookRotation(new Vector3(_direction.x, 0, _direction.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, lerpSpeed);

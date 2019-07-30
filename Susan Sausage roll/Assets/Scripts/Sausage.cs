@@ -1,19 +1,99 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Sausage : MonoBehaviour
 {
+    public class SausageMoveAction : GameAction
+    {
+        private Sausage _sausage;
+        private Vector2Int _dir;
+
+        public SausageMoveAction(Sausage sausage, Vector2Int dir)
+        {
+            _dir = dir;
+            _sausage = sausage;
+        }
+
+        protected override bool CanPerform()
+        {
+            return true;
+        }
+
+        protected override void Perform()
+        {
+            var diff = _dir - _sausage.Dir;
+            if (diff.x != 0 && diff.y != 0)
+            {
+                _sausage.Flip(_dir);
+            }
+            else
+            {
+                _sausage.Move(_dir);
+            }
+        }
+
+        public override void Inverse()
+        {
+        }
+    }
+
+    private void Move(Vector2Int dir)
+    {
+        b1 += dir;
+        b2 += dir;
+    }
+
+    private void Flip(Vector2Int dir)
+    {
+        Move(dir);
+        _flipped = !_flipped;
+    }
+
+    public float lerpSpeed = 1.25f;
     private Vector2Int b1;
     private Vector2Int b2;
+
+    private Vector3 Position => new Vector3(
+        (b1.x + b2.x) / 2f, 1.5f, (b1.y + b2.y) / 2f);
+
     private bool _flipped = false;
+
+    public Vector2Int Dir => b2 - b1;
+
     public void Set(Vector2Int b1, Vector2Int b2)
     {
         this.b1 = b1;
         this.b2 = b2;
-        transform.position = new Vector3(
-            (b1.x + b2.x) / 2f, 1f, (b1.y + b2.y) / 2f
-        );
+        transform.position = Position;
+
         transform.rotation = Quaternion.LookRotation(new Vector3(b2.x - b1.x, 0, b2.y - b1.y));
+    }
+
+    public bool Contains(Vector2Int coord)
+    {
+        return coord.Equals(b1) || coord.Equals(b2);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!transform.position.Equals(Position))
+        {
+            transform.position =
+                Vector3.Lerp(
+                    transform.position,
+                    Position,
+                    lerpSpeed);
+        }
+
+
+        transform.rotation = Quaternion.Lerp(transform.rotation,
+            Quaternion.LookRotation(
+                new Vector3(
+                    b2.x - b1.x, 0, b2.y - b1.y
+                                    ), 
+                _flipped ? Vector3.down : Vector3.up),
+            lerpSpeed);
     }
 }

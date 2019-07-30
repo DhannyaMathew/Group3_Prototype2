@@ -9,6 +9,8 @@ public class Level : MonoBehaviour
     private const uint Floor1 = 0x00ff00; //Green
     private const uint Floor2 = 0x00ff10; //Green
     private const uint Floor3 = 0x00ff20; //Green
+    private const uint Sand = 0x00ffaa; //Green
+    private const uint BlueBlock = 0x0000ff; //Green
     private const uint Grill = 0xff0000; //Red
     private const uint SausageSpawnB1 = 0xa0000000; //Pink
     private const uint SausageSpawnB2 = 0xb0000000; //Pink
@@ -19,6 +21,8 @@ public class Level : MonoBehaviour
     public GameObject floor1Piece;
     public GameObject floor2Piece;
     public GameObject floor3Piece;
+    public GameObject sandPiece;
+    public GameObject blueBlockPiece;
     public GameObject grillPiece;
     public GameObject playerPrefab;
     public GameObject sausagePrefab;
@@ -28,6 +32,7 @@ public class Level : MonoBehaviour
     private int _width, _height;
     private Color[] _pixels;
     private static HashSet<uint> _walkables;
+    private static List<Sausage> _sausages;
     public static Stack<GameAction> Actions;
 
     // Start is called before the first frame update
@@ -35,17 +40,20 @@ public class Level : MonoBehaviour
     {
         if (_instance == null) _instance = this;
         else Destroy(gameObject);
-
+        _sausages = new List<Sausage>();
         Actions = new Stack<GameAction>();
         _walkables = new HashSet<uint>();
         _walkables.Add(Floor1);
         _walkables.Add(Floor2);
         _walkables.Add(Floor3);
+        _walkables.Add(Sand);
+        _walkables.Add(BlueBlock);
         _walkables.Add(Grill);
         _width = levelFile.width;
         _height = levelFile.height;
         _pixels = levelFile.GetPixels();
         var foundSausages = new HashSet<Vector2Int>();
+        var foundLevelStart = new HashSet<Vector2Int>();
         for (int x = 0; x < _width; x++)
         {
             for (int y = 0; y < _height; y++)
@@ -65,12 +73,18 @@ public class Level : MonoBehaviour
                     case Grill:
                         Instantiate(grillPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
+                    case Sand:
+                        Instantiate(sandPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        break;
+                    case BlueBlock:
+                        Instantiate(blueBlockPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        break;
                 }
 
+                Vector2Int s = new Vector2Int(x, y);
                 switch (color & 0xff000000)
                 {
                     case SausageSpawnB1:
-                        Vector2Int s = new Vector2Int(x, y);
                         for (int i = 0; i < 4; i++)
                         {
                             Vector2Int dir = Vector2Int.zero;
@@ -94,13 +108,43 @@ public class Level : MonoBehaviour
                             var a = ToHex(_pixels[n.x + n.y * _width]) & 0xff000000;
                             if (a == SausageSpawnB2 && !foundSausages.Contains(n))
                             {
-                                var sausage = Instantiate(sausagePrefab, new Vector3(), Quaternion.identity);
-                                sausage.GetComponent<Sausage>().Set(s, n);
+                                var obj = Instantiate(sausagePrefab, new Vector3(), Quaternion.identity);
+                                var sausage = obj.GetComponent<Sausage>();
+                                _sausages.Add(sausage);
+                                sausage.Set(s, n);
                                 break;
                             }
                         }
+
                         break;
                     case LevelStartB1:
+                        for (int i = 0; i < 4; i++)
+                        {
+                            Vector2Int dir = Vector2Int.zero;
+                            switch (i)
+                            {
+                                case 0:
+                                    dir = Vector2Int.up;
+                                    break;
+                                case 1:
+                                    dir = Vector2Int.right;
+                                    break;
+                                case 2:
+                                    dir = Vector2Int.down;
+                                    break;
+                                case 3:
+                                    dir = Vector2Int.left;
+                                    break;
+                            }
+
+                            var n = s + dir;
+                            var a = ToHex(_pixels[n.x + n.y * _width]) & 0xff000000;
+                            if (a == LevelStartB2 && !foundLevelStart.Contains(n))
+                            {
+                                break;
+                            }
+                        }
+
                         break;
                 }
             }
@@ -154,10 +198,23 @@ public class Level : MonoBehaviour
     {
         return GetBlock(coord) == Grill;
     }
+
+    public static Sausage CheckForSausage(Vector2Int coord)
+    {
+        foreach (var sausage in _sausages)
+        {
+            if (sausage.Contains(coord))
+            {
+                return sausage;
+            }
+        }
+        return null;
+    }
 }
 
 public abstract class GameAction
 {
+    protected List<GameAction> subActions = new List<GameAction>();
     protected abstract bool CanPerform();
     protected abstract void Perform();
 
@@ -168,6 +225,10 @@ public abstract class GameAction
         if (CanPerform())
         {
             Perform();
+            foreach (var subAction in subActions)
+            {
+                subAction.Perform();
+            }
             Level.Actions.Push(this);
         }
     }
