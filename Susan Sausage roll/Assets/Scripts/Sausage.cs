@@ -39,6 +39,8 @@ public class Sausage : MonoBehaviour
         }
     }
 
+    public Vector2Int axis => new Vector2Int(Mathf.Abs(b2.x - b1.x), Mathf.Abs(b2.y - b1.y));
+
     private void Move(Vector2Int dir)
     {
         b1 += dir;
@@ -94,8 +96,7 @@ public class Sausage : MonoBehaviour
                     lerpSpeed);
         }
 
-        /*currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
-        transform.rotation = Quaternion.AngleAxis(-currentAngle,
-            new Vector3(b2.x - b1.x, Mathf.Abs(b2.x - b1.x) > 0 ? 90 : 0, b2.y - b1.y));*/
+        currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
+        transform.rotation = Quaternion.LookRotation(new Vector3(0, axis.x > 0 ? 0 : 0, 0));
     }
 }
