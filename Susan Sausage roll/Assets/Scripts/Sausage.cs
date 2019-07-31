@@ -21,8 +21,26 @@ public class Sausage : MonoBehaviour
             return true;
         }
 
+        public override string ToString()
+        {
+            return "Sausage roll " + _sausage;
+        }
+
         protected override void Perform()
         {
+            var sausage = Level.CheckForSausage(_sausage.b1 + _dir);
+            if (sausage != null && sausage != _sausage)
+            {
+                subActions.Add(new SausageMoveAction(sausage, _dir));
+            }
+
+            var otherSausage = sausage;
+            sausage = Level.CheckForSausage(_sausage.b2 + _dir);
+            if (sausage != null && sausage != otherSausage && sausage != _sausage)
+            {
+                subActions.Add(new SausageMoveAction(sausage, _dir));
+            }
+            
             var diff = _dir - _sausage.Dir;
             if (diff.x != 0 && diff.y != 0)
             {
@@ -36,6 +54,15 @@ public class Sausage : MonoBehaviour
 
         public override void Inverse()
         {
+            var diff = _dir - _sausage.Dir;
+            if (diff.x != 0 && diff.y != 0)
+            {
+                _sausage.Flip(_dir*-1);
+            }
+            else
+            {
+                _sausage.Move(_dir*-1);
+            }
         }
     }
 

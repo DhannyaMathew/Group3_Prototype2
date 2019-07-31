@@ -171,7 +171,7 @@ public class Level : MonoBehaviour
     {
         if (Actions.Count > 0)
         {
-            Actions.Pop().Inverse();
+            Actions.Pop().Undo();
         }
     }
 
@@ -214,6 +214,7 @@ public class Level : MonoBehaviour
                 return sausage;
             }
         }
+
         return null;
     }
 }
@@ -226,16 +227,30 @@ public abstract class GameAction
 
     public abstract void Inverse();
 
-    public void Execute()
+    public void Undo()
+    {
+        Inverse();
+        foreach (var subAction in subActions)
+        {
+            subAction.Undo();
+        }
+    }
+
+    public void Execute(bool push = true)
     {
         if (CanPerform())
         {
             Perform();
-            foreach (var subAction in subActions)
+            if (subActions.Count > 0)
             {
-                subAction.Perform();
+                foreach (var subAction in subActions)
+                {
+                    subAction.Execute(false);
+                }
             }
-            Level.Actions.Push(this);
+
+            if (push)
+                Level.Actions.Push(this);
         }
     }
 }
