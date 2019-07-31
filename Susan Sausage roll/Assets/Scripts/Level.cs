@@ -7,8 +7,9 @@ using UnityEngine;
 public class Level : MonoBehaviour
 {
     private const uint Floor1 = 0x00ff00; //Green
-    private const uint Floor2 = 0x00ff10; //Green
-    private const uint Floor3 = 0x00ff20; //Green
+    private const uint Floor2 = 0x00ff01; //Green
+    private const uint Floor3 = 0x00ff02; //Green
+    private const uint Floor4 = 0x00ff03; //Green
     private const uint Sand = 0x00ffaa; //Green
     private const uint BlueBlock = 0x0000ff; //Green
     private const uint Grill = 0xff0000; //Red
@@ -21,6 +22,7 @@ public class Level : MonoBehaviour
     public GameObject floor1Piece;
     public GameObject floor2Piece;
     public GameObject floor3Piece;
+    public GameObject floor4Piece;
     public GameObject sandPiece;
     public GameObject blueBlockPiece;
     public GameObject grillPiece;
@@ -46,6 +48,7 @@ public class Level : MonoBehaviour
         _walkables.Add(Floor1);
         _walkables.Add(Floor2);
         _walkables.Add(Floor3);
+        _walkables.Add(Floor4);
         _walkables.Add(Sand);
         _walkables.Add(BlueBlock);
         _walkables.Add(Grill);
@@ -69,6 +72,9 @@ public class Level : MonoBehaviour
                         break;
                     case Floor3:
                         Instantiate(floor3Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        break;
+                    case Floor4:
+                        Instantiate(floor4Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Grill:
                         Instantiate(grillPiece, new Vector3(x, 0.5f, y), Quaternion.identity);

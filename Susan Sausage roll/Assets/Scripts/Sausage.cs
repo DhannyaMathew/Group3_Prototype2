@@ -94,8 +94,8 @@ public class Sausage : MonoBehaviour
                     lerpSpeed);
         }
 
-        currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
+        /*currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
         transform.rotation = Quaternion.AngleAxis(-currentAngle,
-            new Vector3(b2.x - b1.x, Mathf.Abs(b2.x - b1.x) > 0 ? 90 : 0, b2.y - b1.y));
+            new Vector3(b2.x - b1.x, Mathf.Abs(b2.x - b1.x) > 0 ? 90 : 0, b2.y - b1.y));*/
     }
 }
