@@ -48,7 +48,14 @@ public class Sausage : MonoBehaviour
     private void Flip(Vector2Int dir)
     {
         Move(dir);
-        _flipped = !_flipped;
+        if (dir.x > 0 || dir.y > 0)
+        {
+            angle += 180;
+        }
+        else if (dir.x < 0 || dir.y > 0)
+        {
+            angle -= 180;
+        }
     }
 
     public float lerpSpeed = 1.25f;
@@ -58,8 +65,8 @@ public class Sausage : MonoBehaviour
     private Vector3 Position => new Vector3(
         (b1.x + b2.x) / 2f, 1.5f, (b1.y + b2.y) / 2f);
 
-    private bool _flipped = false;
-
+    private float angle = 0;
+    private float currentAngle = 0;
     public Vector2Int Dir => b2 - b1;
 
     public void Set(Vector2Int b1, Vector2Int b2)
@@ -87,13 +94,8 @@ public class Sausage : MonoBehaviour
                     lerpSpeed);
         }
 
-
-        transform.rotation = Quaternion.Lerp(transform.rotation,
-            Quaternion.LookRotation(
-                new Vector3(
-                    b2.x - b1.x, 0, b2.y - b1.y
-                                    ), 
-                _flipped ? Vector3.down : Vector3.up),
-            lerpSpeed);
+        currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
+        transform.rotation = Quaternion.AngleAxis(-currentAngle,
+            new Vector3(b2.x - b1.x, Mathf.Abs(b2.x - b1.x) > 0 ? 90 : 0, b2.y - b1.y));
     }
 }
