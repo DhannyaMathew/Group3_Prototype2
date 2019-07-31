@@ -39,7 +39,18 @@ public class Sausage : MonoBehaviour
         }
     }
 
-    public Vector2Int axis => new Vector2Int(Mathf.Abs(b2.x - b1.x), Mathf.Abs(b2.y - b1.y));
+    public Vector3 axis
+    {
+        get
+        {
+            if (b2.x - b1.x < 0 || b2.y - b1.y < 0)
+            {
+                return Vector3.back;
+            }
+
+            return Vector3.forward;
+        }
+    }
 
     private void Move(Vector2Int dir)
     {
@@ -50,7 +61,7 @@ public class Sausage : MonoBehaviour
     private void Flip(Vector2Int dir)
     {
         Move(dir);
-        if (dir.x > 0 || dir.y > 0)
+        if (dir.x > 0 || dir.y < 0)
         {
             angle += 180;
         }
@@ -73,6 +84,20 @@ public class Sausage : MonoBehaviour
 
     public void Set(Vector2Int b1, Vector2Int b2)
     {
+        if (b1.x > b2.x)
+        {
+            var temp = b1.x;
+            b1.x = b2.x;
+            b2.x = temp;
+        }
+
+        if (b1.y > b2.y)
+        {
+            var temp = b1.y;
+            b1.y = b2.y;
+            b2.y = temp;
+        }
+
         this.b1 = b1;
         this.b2 = b2;
         transform.position = Position;
@@ -96,7 +121,11 @@ public class Sausage : MonoBehaviour
                     lerpSpeed);
         }
 
+        var temp = currentAngle;
         currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
-        transform.rotation = Quaternion.LookRotation(new Vector3(0, axis.x > 0 ? 0 : 0, 0));
+        if (Mathf.Abs(currentAngle - angle) > 0.1f)
+        {
+            transform.Rotate(axis, temp - currentAngle);
+        }
     }
 }
