@@ -23,12 +23,36 @@ public class Player : MonoBehaviour
 
         protected override void Perform()
         {
+            var prevDir = _player._direction;
             _player._direction += _change;
+
+            var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
+            if (sausage != null)
+            {
+                subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
+            }
+
+            var temp = sausage;
+            sausage = Level.CheckForSausage(_player._position + _player._direction);
+            if (sausage != temp && sausage != null)
+            {
+                subActions.Add(new Sausage.SausageMoveAction(sausage, prevDir * -1));
+            }
+            var level = Level.CheckForLevelStart(_player._position, _player._direction);
+            if (level != 0)
+            {
+                subActions.Add(new LevelStart.StartLevel(level));
+            }
         }
 
         public override void Inverse()
         {
             _player._direction -= _change;
+        }
+
+        public override string ToString()
+        {
+            return "Player Rotate";
         }
     }
 
@@ -47,6 +71,11 @@ public class Player : MonoBehaviour
         {
             var val = Level.IsWalkable(_player._position + _player._direction * (_forward ? 1 : -1));
             return val;
+        }
+
+        public override string ToString()
+        {
+            return "Player Move";
         }
 
         protected override void Perform()
@@ -69,6 +98,11 @@ public class Player : MonoBehaviour
             }
 
             _player.Move(_forward);
+            var level = Level.CheckForLevelStart(_player._position, _player._direction);
+            if (level != 0)
+            {
+                subActions.Add(new LevelStart.StartLevel(level));
+            }
         }
 
         public override void Inverse()
