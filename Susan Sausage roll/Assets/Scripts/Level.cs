@@ -40,6 +40,7 @@ public class Level : MonoBehaviour
     private static HashSet<uint> _walkables;
     private static List<Sausage> _sausages;
     private static List<LevelStart> _levelStarters;
+    private static List<Grill> _grills;
     private static Floor[] _floors;
     public static Stack<GameAction> Actions;
 
@@ -50,6 +51,7 @@ public class Level : MonoBehaviour
         else Destroy(gameObject);
         _sausages = new List<Sausage>();
         _levelStarters = new List<LevelStart>();
+        _grills = new List<Grill>();
         Actions = new Stack<GameAction>();
         _walkables = new HashSet<uint>();
         _walkables.Add(Floor1);
@@ -89,6 +91,7 @@ public class Level : MonoBehaviour
                         break;
                     case Grill:
                         floor = Instantiate(grillPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        _grills.Add(floor.GetComponent<Grill>());
                         break;
                     case Sand:
                         floor = Instantiate(sandPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
@@ -131,7 +134,7 @@ public class Level : MonoBehaviour
                             var obj = Instantiate(sausagePrefab, new Vector3(), Quaternion.identity);
                             var sausage = obj.GetComponent<Sausage>();
                             _sausages.Add(sausage);
-                            sausage.Set(s, n);
+                            sausage.Set(s, n, GetMaskCode(s));
                             break;
                         }
                     }
@@ -191,7 +194,24 @@ public class Level : MonoBehaviour
 
     public static bool IsWalkable(Vector2Int coord)
     {
-        return _walkables.Contains(GetBlock(coord));
+        var floor = GetFloor(coord);
+        if (floor == null)
+        {
+            return false;
+        }
+
+        return _walkables.Contains(GetBlock(coord)) && !floor.drop;
+    }
+
+    private static Floor GetFloor(Vector2Int coord)
+    {
+        foreach (var floor in _floors)
+        {
+            if (floor.Pos.Equals(coord))
+                return floor;
+        }
+
+        return null;
     }
 
     public static Vector2Int GetPlayerSpawn()
@@ -216,7 +236,7 @@ public class Level : MonoBehaviour
 
     public static bool IsGrill(Vector2Int coord)
     {
-        return GetBlock(coord) == Grill;
+        return GetBlock(coord) == Grill && LevelStart.aLevelStarted != 0;
     }
 
     public static Sausage CheckForSausage(Vector2Int coord)
@@ -253,16 +273,17 @@ public class Level : MonoBehaviour
     }
 
 
-    public static uint CheckForLevelStart(Vector2Int pos, Vector2Int dir)
+    public static LevelStart CheckForLevelStart(Vector2Int pos, Vector2Int dir)
     {
-        var b1 = GetEnitiy(pos);
-        var b2 = GetEnitiy(pos + dir);
-        if (b1 == LevelStartB1 && b2 == LevelStartB2)
+        foreach (var levelStarter in _levelStarters)
         {
-            return GetMaskCode(pos);
+            if (levelStarter.Contains(pos, dir))
+            {
+                return levelStarter;
+            }
         }
 
-        return 0;
+        return null;
     }
 
     public static void DropAllExcludingMask(uint code)
@@ -274,6 +295,27 @@ public class Level : MonoBehaviour
                 floor.Drop();
             }
         }
+
+        foreach (var sausage in _sausages)
+        {
+            if (sausage.Code != code)
+            {
+                sausage.Fall();
+            }
+        }
+
+        foreach (var levelStarter in _levelStarters)
+        {
+            levelStarter.Deactivate();
+        }
+
+        foreach (var grill in _grills)
+        {
+            if (grill.gameObject.GetComponent<Floor>().Code == code)
+            {
+                grill.TurnOn();
+            }
+        }
     }
 
     public static void RiseAll()
@@ -282,12 +324,28 @@ public class Level : MonoBehaviour
         {
             floor.Rise();
         }
+
+        foreach (var sausage in _sausages)
+        {
+            sausage.Rise();
+        }
+
+        foreach (var levelStarter in _levelStarters)
+        {
+            levelStarter.Activate();
+        }
+
+        foreach (var grill in _grills)
+        {
+            grill.TurnOff();
+        }
     }
 }
 
 
 public abstract class GameAction
 {
+    private bool didExecute;
     protected List<GameAction> subActions = new List<GameAction>();
     protected abstract bool CanPerform();
     protected abstract void Perform();
@@ -296,10 +354,13 @@ public abstract class GameAction
 
     public void Undo()
     {
-        Inverse();
-        foreach (var subAction in subActions)
+        if (didExecute)
         {
-            subAction.Undo();
+            Inverse();
+            foreach (var subAction in subActions)
+            {
+                subAction.Undo();
+            }
         }
     }
 
@@ -308,6 +369,7 @@ public abstract class GameAction
         if (CanPerform())
         {
             Perform();
+            didExecute = true;
             if (subActions.Count > 0)
             {
                 foreach (var subAction in subActions)

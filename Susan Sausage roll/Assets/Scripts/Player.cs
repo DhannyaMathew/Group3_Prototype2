@@ -18,6 +18,27 @@ public class Player : MonoBehaviour
 
         protected override bool CanPerform()
         {
+            if (LevelStart.aLevelStarted == 0)
+            {
+                var prevDir = _player._direction;
+                _player._direction += _change;
+                var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
+                if (sausage != null)
+                {
+                    _player._direction -= _change;
+                    return false;
+                }
+
+                var temp = sausage;
+                sausage = Level.CheckForSausage(_player._position + _player._direction);
+                if (sausage != temp && sausage != null)
+                {
+                    _player._direction -= _change;
+                    return false;
+                }
+
+                _player._direction -= _change;
+            }
             return true;
         }
 
@@ -27,19 +48,20 @@ public class Player : MonoBehaviour
             _player._direction += _change;
 
             var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
-            if (sausage != null)
+            if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
             {
                 subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
             }
 
             var temp = sausage;
             sausage = Level.CheckForSausage(_player._position + _player._direction);
-            if (sausage != temp && sausage != null)
+            if (sausage != temp && sausage != null && sausage.Code == LevelStart.aLevelStarted)
             {
                 subActions.Add(new Sausage.SausageMoveAction(sausage, prevDir * -1));
             }
+
             var level = Level.CheckForLevelStart(_player._position, _player._direction);
-            if (level != 0)
+            if (level != null)
             {
                 subActions.Add(new LevelStart.StartLevel(level));
             }
@@ -69,6 +91,27 @@ public class Player : MonoBehaviour
 
         protected override bool CanPerform()
         {
+            if (LevelStart.aLevelStarted == 0)
+            {
+              
+                if (_forward)
+                {
+                    var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
+                    if (sausage != null)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    var sausage = Level.CheckForSausage(_player._position - _player._direction);
+                    if (sausage != null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
             var val = Level.IsWalkable(_player._position + _player._direction * (_forward ? 1 : -1));
             return val;
         }
@@ -83,7 +126,7 @@ public class Player : MonoBehaviour
             if (_forward)
             {
                 var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
-                if (sausage != null)
+                if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
                 {
                     subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
                 }
@@ -91,7 +134,7 @@ public class Player : MonoBehaviour
             else
             {
                 var sausage = Level.CheckForSausage(_player._position - _player._direction);
-                if (sausage != null)
+                if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
                 {
                     subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction * -1));
                 }
@@ -99,7 +142,7 @@ public class Player : MonoBehaviour
 
             _player.Move(_forward);
             var level = Level.CheckForLevelStart(_player._position, _player._direction);
-            if (level != 0)
+            if (level != null)
             {
                 subActions.Add(new LevelStart.StartLevel(level));
             }

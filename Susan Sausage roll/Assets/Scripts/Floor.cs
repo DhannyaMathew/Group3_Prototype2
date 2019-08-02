@@ -11,22 +11,22 @@ public class Floor : MonoBehaviour
     public float dropSpeed;
     public uint Code { get; private set; }
 
-    private bool _drop;
+    public bool drop { get; private set; }
 
     public void Drop()
     {
-        _drop = true;
+        drop = true;
     }
 
     public void Rise()
     {
-        _drop = false;
+        drop = false;
     }
 
     private void FixedUpdate()
     {
         var temp = transform.position;
-        transform.position = Vector3.Lerp(temp, new Vector3(temp.x, _drop ? -1f : 0.5f, temp.z), dropSpeed);
+        transform.position = Vector3.Lerp(temp, new Vector3(temp.x, drop ? -1f : 0.5f, temp.z), dropSpeed);
     }
 
     public void Set(Vector2Int pos, uint code)

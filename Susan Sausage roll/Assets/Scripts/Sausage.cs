@@ -5,6 +5,31 @@ using UnityEngine.UIElements;
 
 public class Sausage : MonoBehaviour
 {
+    public class SausageBurnAction : GameAction
+    {
+        private Burn burn;
+
+        public SausageBurnAction(Burn burn)
+        {
+            this.burn = burn;
+        }
+
+        protected override bool CanPerform()
+        {
+            return true;
+        }
+
+        protected override void Perform()
+        {
+            burn.BurnPiece();
+        }
+
+        public override void Inverse()
+        {
+            burn.UndoPiece();
+        }
+    }
+
     public class SausageMoveAction : GameAction
     {
         private Sausage _sausage;
@@ -18,7 +43,7 @@ public class Sausage : MonoBehaviour
 
         protected override bool CanPerform()
         {
-            return true;
+            return LevelStart.aLevelStarted != 0;
         }
 
         public override string ToString()
@@ -29,14 +54,14 @@ public class Sausage : MonoBehaviour
         protected override void Perform()
         {
             var sausage = Level.CheckForSausage(_sausage.b1 + _dir);
-            if (sausage != null && sausage != _sausage)
+            if (sausage != null && sausage != _sausage && _sausage.Code == sausage.Code)
             {
                 subActions.Add(new SausageMoveAction(sausage, _dir));
             }
 
             var otherSausage = sausage;
             sausage = Level.CheckForSausage(_sausage.b2 + _dir);
-            if (sausage != null && sausage != otherSausage && sausage != _sausage)
+            if (sausage != null && sausage != otherSausage && sausage != _sausage && _sausage.Code == sausage.Code)
             {
                 subActions.Add(new SausageMoveAction(sausage, _dir));
             }
@@ -53,11 +78,27 @@ public class Sausage : MonoBehaviour
 
             if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
             {
+                _sausage.Fall();
+            }
+
+            if (Level.IsGrill(_sausage.b2))
+            {
+                subActions.Add(new SausageBurnAction((_sausage._flipped ? _sausage.s3 : _sausage.s1).gameObject
+                    .GetComponent<Burn>()));
+            }
+            if (Level.IsGrill(_sausage.b1))
+            {
+                subActions.Add(new SausageBurnAction((_sausage._flipped ? _sausage.s4 : _sausage.s2).gameObject
+                    .GetComponent<Burn>()));
             }
         }
 
         public override void Inverse()
         {
+            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
+            {
+                _sausage.Rise();
+            }
             var diff = _dir - _sausage.Dir;
             if (diff.x != 0 && diff.y != 0)
             {
@@ -67,26 +108,28 @@ public class Sausage : MonoBehaviour
             {
                 _sausage.Move(_dir * -1);
             }
-
-            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
-            {
-            }
         }
     }
 
     public float lerpSpeed = 1.25f;
-    public float fallSpeed = 0.005f;
+    private bool _fall;
     private Vector2Int b1;
     private Vector2Int b2;
     private float currentLerpSpeed;
-    
+
     private Vector3 Position => new Vector3(
-        (b1.x + b2.x) / 2f, 1.5f, (b1.y + b2.y) / 2f);
+        (b1.x + b2.x) / 2f, _fall ? -0.5f : 1.5f, (b1.y + b2.y) / 2f);
 
     private float angle = 0;
     private float currentAngle = 0;
-    private Rigidbody _rigidbody;
     private bool _sinking;
+    private bool _flipped;
+    public float fallSpeed = 0.05f;
+    public GameObject s1;
+    public GameObject s2;
+    public GameObject s3;
+    public GameObject s4;
+    public uint Code { get; private set; }
     public Vector2Int Dir => b2 - b1;
 
     public Vector3 axis
@@ -97,14 +140,12 @@ public class Sausage : MonoBehaviour
             {
                 return Vector3.back;
             }
-
             return Vector3.forward;
         }
     }
 
     private void Start()
     {
-        _rigidbody = GetComponent<Rigidbody>();
         currentLerpSpeed = lerpSpeed;
     }
 
@@ -116,6 +157,7 @@ public class Sausage : MonoBehaviour
 
     private void Flip(Vector2Int dir)
     {
+        _flipped = !_flipped;
         Move(dir);
         if (dir.x > 0 || dir.y < 0)
         {
@@ -126,10 +168,10 @@ public class Sausage : MonoBehaviour
             angle -= 180;
         }
     }
-
-
-    public void Set(Vector2Int b1, Vector2Int b2)
+    
+    public void Set(Vector2Int b1, Vector2Int b2, uint code)
     {
+        Code = code;
         if (b1.x > b2.x)
         {
             var temp = b1.x;
@@ -169,5 +211,17 @@ public class Sausage : MonoBehaviour
         {
             transform.Rotate(axis, temp - currentAngle);
         }
+    }
+
+    public void Fall()
+    {
+        _fall = true;
+        currentLerpSpeed = fallSpeed;
+    }
+
+    public void Rise()
+    {
+        _fall = false;
+        currentLerpSpeed = lerpSpeed;
     }
 }
