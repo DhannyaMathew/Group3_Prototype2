@@ -19,6 +19,7 @@ public class Level : MonoBehaviour
     private const uint LevelStartB2 = 0x80000000; //Blue
 
     public Texture2D levelFile;
+    public Texture2D levelMask;
     public GameObject floor1Piece;
     public GameObject floor2Piece;
     public GameObject floor3Piece;
@@ -28,13 +29,18 @@ public class Level : MonoBehaviour
     public GameObject grillPiece;
     public GameObject playerPrefab;
     public GameObject sausagePrefab;
+    public GameObject levelStartPrefab;
     private static Level _instance;
     public Vector2Int playerSpawn;
 
+    private uint _currentLevel = 0;
     private int _width, _height;
     private Color[] _pixels;
+    private Color[] _levelMaskPixels;
     private static HashSet<uint> _walkables;
     private static List<Sausage> _sausages;
+    private static List<LevelStart> _levelStarters;
+    private static Floor[] _floors;
     public static Stack<GameAction> Actions;
 
     // Start is called before the first frame update
@@ -43,6 +49,7 @@ public class Level : MonoBehaviour
         if (_instance == null) _instance = this;
         else Destroy(gameObject);
         _sausages = new List<Sausage>();
+        _levelStarters = new List<LevelStart>();
         Actions = new Stack<GameAction>();
         _walkables = new HashSet<uint>();
         _walkables.Add(Floor1);
@@ -55,107 +62,114 @@ public class Level : MonoBehaviour
         _width = levelFile.width;
         _height = levelFile.height;
         _pixels = levelFile.GetPixels();
+        _levelMaskPixels = levelMask.GetPixels();
         var foundSausages = new HashSet<Vector2Int>();
         var foundLevelStart = new HashSet<Vector2Int>();
         for (int x = 0; x < _width; x++)
         {
             for (int y = 0; y < _height; y++)
             {
-                var color = ToHex(_pixels[x + y * _width]);
-                switch (color & 0x00ffffff)
+                var s = new Vector2Int(x, y);
+                var block = GetBlock(s);
+                var entity = GetEnitiy(s);
+                GameObject floor = null;
+                switch (block)
                 {
                     case Floor1:
-                        Instantiate(floor1Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(floor1Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Floor2:
-                        Instantiate(floor2Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(floor2Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Floor3:
-                        Instantiate(floor3Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(floor3Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Floor4:
-                        Instantiate(floor4Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(floor4Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Grill:
-                        Instantiate(grillPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(grillPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case Sand:
-                        Instantiate(sandPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(sandPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                     case BlueBlock:
-                        Instantiate(blueBlockPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(blueBlockPiece, new Vector3(x, 0.5f, y), Quaternion.identity);
                         break;
                 }
 
-                Vector2Int s = new Vector2Int(x, y);
-                switch (color & 0xff000000)
+                if (floor != null)
                 {
-                    case SausageSpawnB1:
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Vector2Int dir = Vector2Int.zero;
-                            switch (i)
-                            {
-                                case 0:
-                                    dir = Vector2Int.up;
-                                    break;
-                                case 1:
-                                    dir = Vector2Int.right;
-                                    break;
-                                case 2:
-                                    dir = Vector2Int.down;
-                                    break;
-                                case 3:
-                                    dir = Vector2Int.left;
-                                    break;
-                            }
-
-                            var n = s + dir;
-                            var a = ToHex(_pixels[n.x + n.y * _width]) & 0xff000000;
-                            if (a == SausageSpawnB2 && !foundSausages.Contains(n))
-                            {
-                                var obj = Instantiate(sausagePrefab, new Vector3(), Quaternion.identity);
-                                var sausage = obj.GetComponent<Sausage>();
-                                _sausages.Add(sausage);
-                                sausage.Set(s, n);
-                                break;
-                            }
-                        }
-
-                        break;
-                    case LevelStartB1:
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Vector2Int dir = Vector2Int.zero;
-                            switch (i)
-                            {
-                                case 0:
-                                    dir = Vector2Int.up;
-                                    break;
-                                case 1:
-                                    dir = Vector2Int.right;
-                                    break;
-                                case 2:
-                                    dir = Vector2Int.down;
-                                    break;
-                                case 3:
-                                    dir = Vector2Int.left;
-                                    break;
-                            }
-
-                            var n = s + dir;
-                            var a = ToHex(_pixels[n.x + n.y * _width]) & 0xff000000;
-                            if (a == LevelStartB2 && !foundLevelStart.Contains(n))
-                            {
-                                break;
-                            }
-                        }
-
-                        break;
+                    floor.GetComponent<Floor>().Set(s, ToHex(_levelMaskPixels[x + _width * y]));
                 }
+
+
+                if (entity == SausageSpawnB1)
+                    for (int i = 0; i < 4; i++)
+                    {
+                        var dir = Vector2Int.zero;
+                        switch (i)
+                        {
+                            case 0:
+                                dir = Vector2Int.up;
+                                break;
+                            case 1:
+                                dir = Vector2Int.right;
+                                break;
+                            case 2:
+                                dir = Vector2Int.down;
+                                break;
+                            case 3:
+                                dir = Vector2Int.left;
+                                break;
+                        }
+
+                        var n = s + dir;
+                        var a = ToHex(_pixels[n.x + n.y * _width]) & 0xff000000;
+                        if (a == SausageSpawnB2 && !foundSausages.Contains(n))
+                        {
+                            var obj = Instantiate(sausagePrefab, new Vector3(), Quaternion.identity);
+                            var sausage = obj.GetComponent<Sausage>();
+                            _sausages.Add(sausage);
+                            sausage.Set(s, n);
+                            break;
+                        }
+                    }
+                else if (entity == LevelStartB1)
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Vector2Int dir = Vector2Int.zero;
+                        switch (i)
+                        {
+                            case 0:
+                                dir = Vector2Int.up;
+                                break;
+                            case 1:
+                                dir = Vector2Int.right;
+                                break;
+                            case 2:
+                                dir = Vector2Int.down;
+                                break;
+                            case 3:
+                                dir = Vector2Int.left;
+                                break;
+                        }
+
+                        var n = s + dir;
+                        var a = GetEnitiy(n);
+                        if (a == LevelStartB2 && !foundLevelStart.Contains(n))
+                        {
+                            var obj = Instantiate(levelStartPrefab, new Vector3(), Quaternion.identity);
+                            var levelStart = obj.GetComponent<LevelStart>();
+                            _levelStarters.Add(levelStart);
+                            levelStart.Set(s, n, ToHex(_levelMaskPixels[x + _width * y]));
+                            break;
+                        }
+                    }
             }
         }
 
+        _floors = FindObjectsOfType<Floor>();
         Instantiate(playerPrefab, new Vector3(playerSpawn.x, 1f, playerSpawn.y), Quaternion.identity);
     }
 
@@ -217,7 +231,60 @@ public class Level : MonoBehaviour
 
         return null;
     }
+
+    public static uint GetEnitiy(Vector2Int coord)
+    {
+        if (coord.x < 0 || coord.x >= _instance._width || coord.y < 0 || coord.y >= _instance._height)
+        {
+            return 0;
+        }
+
+        return ToHex(_instance._pixels[coord.x + _instance._width * coord.y]) & 0xff000000;
+    }
+
+    public static uint GetMaskCode(Vector2Int coord)
+    {
+        if (coord.x < 0 || coord.x >= _instance._width || coord.y < 0 || coord.y >= _instance._height)
+        {
+            return 0;
+        }
+
+        return ToHex(_instance._levelMaskPixels[coord.x + _instance._width * coord.y]);
+    }
+
+
+    public static uint CheckForLevelStart(Vector2Int pos, Vector2Int dir)
+    {
+        var b1 = GetEnitiy(pos);
+        var b2 = GetEnitiy(pos + dir);
+        if (b1 == LevelStartB1 && b2 == LevelStartB2)
+        {
+            return GetMaskCode(pos);
+        }
+
+        return 0;
+    }
+
+    public static void DropAllExcludingMask(uint code)
+    {
+        foreach (var floor in _floors)
+        {
+            if (floor.Code != code)
+            {
+                floor.Drop();
+            }
+        }
+    }
+
+    public static void RiseAll()
+    {
+        foreach (var floor in _floors)
+        {
+            floor.Rise();
+        }
+    }
 }
+
 
 public abstract class GameAction
 {

@@ -40,7 +40,7 @@ public class Sausage : MonoBehaviour
             {
                 subActions.Add(new SausageMoveAction(sausage, _dir));
             }
-            
+
             var diff = _dir - _sausage.Dir;
             if (diff.x != 0 && diff.y != 0)
             {
@@ -50,6 +50,10 @@ public class Sausage : MonoBehaviour
             {
                 _sausage.Move(_dir);
             }
+
+            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
+            {
+            }
         }
 
         public override void Inverse()
@@ -57,14 +61,33 @@ public class Sausage : MonoBehaviour
             var diff = _dir - _sausage.Dir;
             if (diff.x != 0 && diff.y != 0)
             {
-                _sausage.Flip(_dir*-1);
+                _sausage.Flip(_dir * -1);
             }
             else
             {
-                _sausage.Move(_dir*-1);
+                _sausage.Move(_dir * -1);
+            }
+
+            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
+            {
             }
         }
     }
+
+    public float lerpSpeed = 1.25f;
+    public float fallSpeed = 0.005f;
+    private Vector2Int b1;
+    private Vector2Int b2;
+    private float currentLerpSpeed;
+    
+    private Vector3 Position => new Vector3(
+        (b1.x + b2.x) / 2f, 1.5f, (b1.y + b2.y) / 2f);
+
+    private float angle = 0;
+    private float currentAngle = 0;
+    private Rigidbody _rigidbody;
+    private bool _sinking;
+    public Vector2Int Dir => b2 - b1;
 
     public Vector3 axis
     {
@@ -77,6 +100,12 @@ public class Sausage : MonoBehaviour
 
             return Vector3.forward;
         }
+    }
+
+    private void Start()
+    {
+        _rigidbody = GetComponent<Rigidbody>();
+        currentLerpSpeed = lerpSpeed;
     }
 
     private void Move(Vector2Int dir)
@@ -98,16 +127,6 @@ public class Sausage : MonoBehaviour
         }
     }
 
-    public float lerpSpeed = 1.25f;
-    private Vector2Int b1;
-    private Vector2Int b2;
-
-    private Vector3 Position => new Vector3(
-        (b1.x + b2.x) / 2f, 1.5f, (b1.y + b2.y) / 2f);
-
-    private float angle = 0;
-    private float currentAngle = 0;
-    public Vector2Int Dir => b2 - b1;
 
     public void Set(Vector2Int b1, Vector2Int b2)
     {
@@ -128,7 +147,6 @@ public class Sausage : MonoBehaviour
         this.b1 = b1;
         this.b2 = b2;
         transform.position = Position;
-
         transform.rotation = Quaternion.LookRotation(new Vector3(b2.x - b1.x, 0, b2.y - b1.y));
     }
 
@@ -139,17 +157,14 @@ public class Sausage : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!transform.position.Equals(Position))
-        {
-            transform.position =
-                Vector3.Lerp(
-                    transform.position,
-                    Position,
-                    lerpSpeed);
-        }
-
+        var pos = Position;
+        transform.position =
+            Vector3.Lerp(
+                transform.position,
+                pos,
+                currentLerpSpeed);
         var temp = currentAngle;
-        currentAngle = Mathf.Lerp(currentAngle, angle, lerpSpeed / 2f);
+        currentAngle = Mathf.Lerp(currentAngle, angle, currentLerpSpeed);
         if (Mathf.Abs(currentAngle - angle) > 0.1f)
         {
             transform.Rotate(axis, temp - currentAngle);
