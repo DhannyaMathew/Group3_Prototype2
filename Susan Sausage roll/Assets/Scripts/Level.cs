@@ -41,6 +41,7 @@ public class Level : MonoBehaviour
     private static List<Sausage> _sausages;
     private static List<LevelStart> _levelStarters;
     private static List<Grill> _grills;
+    private static List<uint> _levelsCompleted;
     private static Floor[] _floors;
     public static Stack<GameAction> Actions;
 
@@ -51,6 +52,7 @@ public class Level : MonoBehaviour
         else Destroy(gameObject);
         _sausages = new List<Sausage>();
         _levelStarters = new List<LevelStart>();
+        _levelsCompleted = new List<uint>();
         _grills = new List<Grill>();
         Actions = new Stack<GameAction>();
         _walkables = new HashSet<uint>();
@@ -73,7 +75,7 @@ public class Level : MonoBehaviour
             {
                 var s = new Vector2Int(x, y);
                 var block = GetBlock(s);
-                var entity = GetEnitiy(s);
+                var entity = GetEntitiy(s);
                 GameObject floor = null;
                 switch (block)
                 {
@@ -159,7 +161,7 @@ public class Level : MonoBehaviour
                         }
 
                         var n = s + dir;
-                        var a = GetEnitiy(n);
+                        var a = GetEntitiy(n);
                         if (a == LevelStartB2 && !foundLevelStart.Contains(n))
                         {
                             var obj = Instantiate(levelStartPrefab, new Vector3(), Quaternion.identity);
@@ -181,6 +183,19 @@ public class Level : MonoBehaviour
         if (Input.GetButtonDown("Undo"))
         {
             Undo();
+        }
+    }
+
+    public static void CompleteLevel(uint level)
+    {
+        _levelsCompleted.Add(level);
+        foreach (var sausage in _sausages)
+        {
+            if (sausage.Code == level)
+            {
+                sausage.Remove();
+                //  _sausages.Remove(sausage);
+            }
         }
     }
 
@@ -236,23 +251,29 @@ public class Level : MonoBehaviour
 
     public static bool IsGrill(Vector2Int coord)
     {
-        return GetBlock(coord) == Grill && LevelStart.aLevelStarted != 0;
+        foreach (var grill in _grills)
+        {
+            if (grill.gameObject.GetComponent<Floor>().Pos.Equals(coord))
+            {
+                return grill.IsOn;
+            }
+        }
+        return false;
     }
 
     public static Sausage CheckForSausage(Vector2Int coord)
     {
         foreach (var sausage in _sausages)
         {
-            if (sausage.Contains(coord))
+            if (sausage.Contains(coord) && sausage.IsNotDestroyed)
             {
                 return sausage;
             }
         }
-
         return null;
     }
 
-    public static uint GetEnitiy(Vector2Int coord)
+    public static uint GetEntitiy(Vector2Int coord)
     {
         if (coord.x < 0 || coord.x >= _instance._width || coord.y < 0 || coord.y >= _instance._height)
         {
@@ -270,6 +291,11 @@ public class Level : MonoBehaviour
         }
 
         return ToHex(_instance._levelMaskPixels[coord.x + _instance._width * coord.y]);
+    }
+
+    public static bool LevelCompleted(uint code)
+    {
+        return _levelsCompleted.Contains(code);
     }
 
 
@@ -339,6 +365,38 @@ public class Level : MonoBehaviour
         {
             grill.TurnOff();
         }
+    }
+
+    public static void ClearActionStack()
+    {
+        Actions.Clear();
+    }
+
+    public static bool AllSausagesCooked(uint code)
+    {
+        bool result = true;
+        foreach (var sausage in _sausages)
+        {
+            if (sausage.Code == code)
+            {
+                result = result && sausage.Cooked();
+            }
+        }
+
+        return result;
+    }
+
+    public static LevelStart GetLevelStarter(uint code)
+    {
+        foreach (var levelStarter in _levelStarters)
+        {
+            if (levelStarter.Code == code)
+            {
+                return levelStarter;
+            }
+        }
+
+        return null;
     }
 }
 

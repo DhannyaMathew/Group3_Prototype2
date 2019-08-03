@@ -63,7 +63,7 @@ public class Player : MonoBehaviour
             var level = Level.CheckForLevelStart(_player._position, _player._direction);
             if (level != null)
             {
-                subActions.Add(new LevelStart.StartLevel(level));
+                subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
         }
 
@@ -144,8 +144,9 @@ public class Player : MonoBehaviour
             var level = Level.CheckForLevelStart(_player._position, _player._direction);
             if (level != null)
             {
-                subActions.Add(new LevelStart.StartLevel(level));
+                subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
+            
         }
 
         public override void Inverse()

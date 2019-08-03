@@ -4,58 +4,21 @@ using UnityEngine;
 
 public class Grill : MonoBehaviour
 {
-   /*public class GrillAction : GameAction
-   {
-      private Grill grill;
-      private bool nextState;
-      public GrillAction(Grill grill, bool nextState)
-      {
-         this.grill = grill;
-         this.nextState = nextState;
-      }
-      protected override bool CanPerform()
-      {
-         return true;
-      }
 
-      protected override void Perform()
-      {
-         if (nextState)
-         {
-            grill.TurnOn();
-         }
-         else
-         {
-            grill.TurnOff();
-         }
-      }
+    public Material offMat;
+    public Material onMat;
+    
+    public bool IsOn { get; private set; }
 
-      public override void Inverse()
-      {
-         if (!nextState)
-         {
-            grill.TurnOn();
-         }
-         else
-         {
-            grill.TurnOff();
-         }
-      }
-   }*/
-   
-   public Material offMat;
-   public Material onMat;
+    public void TurnOn()
+    {
+        IsOn = true;
+        GetComponentInChildren<Renderer>().material = onMat;
+    }
 
-   private bool isOn = false;
-
-   public void TurnOn()
-   {
-      isOn = true;
-      GetComponentInChildren<Renderer>().material = onMat;
-   }
-   public void TurnOff()
-   {
-      isOn = false;
-      GetComponentInChildren<Renderer>().material = offMat;
-   }
+    public void TurnOff()
+    {
+        IsOn = false;
+        GetComponentInChildren<Renderer>().material = offMat;
+    }
 }

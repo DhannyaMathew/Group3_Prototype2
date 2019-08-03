@@ -7,11 +7,36 @@ public class LevelStart : MonoBehaviour
 {
     public static uint aLevelStarted = 0;
 
-    public class StartLevel : GameAction
+    public class EndLevel : GameAction
     {
         private LevelStart ls;
 
-        public StartLevel(LevelStart ls)
+        public EndLevel(uint code)
+        {
+            ls = Level.GetLevelStarter(code);
+        }
+
+        protected override bool CanPerform()
+        {
+            return !ls.Active;
+        }
+
+        protected override void Perform()
+        {
+            ls.Activate();
+        }
+
+        public override void Inverse()
+        {
+            ls.Deactivate();
+        }
+    }
+
+    public class PlayerEnterAction : GameAction
+    {
+        private LevelStart ls;
+
+        public PlayerEnterAction(LevelStart ls)
         {
             this.ls = ls;
         }
@@ -23,15 +48,32 @@ public class LevelStart : MonoBehaviour
 
         protected override void Perform()
         {
-            Debug.Log("Starting Level: "+Convert.ToString(ls.Code,16));
-            Level.DropAllExcludingMask(ls.Code);
-            aLevelStarted = ls.Code;
+            if (aLevelStarted == 0)
+            {
+                Level.DropAllExcludingMask(ls.Code);
+                aLevelStarted = ls.Code;
+            }
+            else
+            {
+                Level.CompleteLevel(ls.Code);
+                Level.RiseAll();
+                ls.Deactivate();
+                aLevelStarted = 0;
+            }
         }
 
         public override void Inverse()
         {
-            Level.RiseAll();
-            aLevelStarted = 0;
+            if (aLevelStarted == 0)
+            {
+                Level.DropAllExcludingMask(ls.Code);
+                aLevelStarted = ls.Code;
+            }
+            else
+            {
+                Level.RiseAll();
+                aLevelStarted = 0;
+            }
         }
     }
 
@@ -60,10 +102,13 @@ public class LevelStart : MonoBehaviour
 
     public void Activate()
     {
-        Active = true;
-        for (int i = 0; i < transform.childCount; i++)
+        if (!Level.LevelCompleted(Code))
         {
-            transform.GetChild(i).gameObject.SetActive(true);
+            Active = true;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                transform.GetChild(i).gameObject.SetActive(true);
+            }
         }
     }
 

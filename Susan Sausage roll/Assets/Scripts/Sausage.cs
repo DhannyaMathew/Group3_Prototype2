@@ -8,10 +8,12 @@ public class Sausage : MonoBehaviour
     public class SausageBurnAction : GameAction
     {
         private Burn burn;
+        private Sausage _sausage;
 
         public SausageBurnAction(Burn burn)
         {
             this.burn = burn;
+            _sausage = burn.gameObject.GetComponentInParent<Sausage>();
         }
 
         protected override bool CanPerform()
@@ -22,6 +24,10 @@ public class Sausage : MonoBehaviour
         protected override void Perform()
         {
             burn.BurnPiece();
+            if (Level.AllSausagesCooked(LevelStart.aLevelStarted))
+            {
+                subActions.Add(new LevelStart.EndLevel(_sausage.Code));
+            }
         }
 
         public override void Inverse()
@@ -78,7 +84,7 @@ public class Sausage : MonoBehaviour
 
             if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
             {
-                _sausage.Fall();
+                _sausage.Sink();
             }
 
             if (Level.IsGrill(_sausage.b2))
@@ -86,6 +92,7 @@ public class Sausage : MonoBehaviour
                 subActions.Add(new SausageBurnAction((_sausage._flipped ? _sausage.s3 : _sausage.s1).gameObject
                     .GetComponent<Burn>()));
             }
+
             if (Level.IsGrill(_sausage.b1))
             {
                 subActions.Add(new SausageBurnAction((_sausage._flipped ? _sausage.s4 : _sausage.s2).gameObject
@@ -99,6 +106,7 @@ public class Sausage : MonoBehaviour
             {
                 _sausage.Rise();
             }
+
             var diff = _dir - _sausage.Dir;
             if (diff.x != 0 && diff.y != 0)
             {
@@ -117,18 +125,20 @@ public class Sausage : MonoBehaviour
     private Vector2Int b2;
     private float currentLerpSpeed;
 
-    private Vector3 Position => new Vector3(
-        (b1.x + b2.x) / 2f, _fall ? -0.5f : 1.5f, (b1.y + b2.y) / 2f);
+    public Vector3 Position => new Vector3(
+        (b1.x + b2.x) / 2f, _fall ? -0.6f : 1.5f, (b1.y + b2.y) / 2f);
 
     private float angle = 0;
     private float currentAngle = 0;
     private bool _sinking;
     private bool _flipped;
+    public float sinkSpeed = 0.15f;
     public float fallSpeed = 0.05f;
     public GameObject s1;
     public GameObject s2;
     public GameObject s3;
     public GameObject s4;
+    public GameObject sausageExplode;
     public uint Code { get; private set; }
     public Vector2Int Dir => b2 - b1;
 
@@ -140,9 +150,12 @@ public class Sausage : MonoBehaviour
             {
                 return Vector3.back;
             }
+
             return Vector3.forward;
         }
     }
+
+    public bool IsNotDestroyed { get; private set; }
 
     private void Start()
     {
@@ -168,9 +181,10 @@ public class Sausage : MonoBehaviour
             angle -= 180;
         }
     }
-    
+
     public void Set(Vector2Int b1, Vector2Int b2, uint code)
     {
+        IsNotDestroyed = true;
         Code = code;
         if (b1.x > b2.x)
         {
@@ -200,6 +214,15 @@ public class Sausage : MonoBehaviour
     private void FixedUpdate()
     {
         var pos = Position;
+
+        if (_sinking)
+        {
+            var twoDCoord1 = new Vector3(transform.position.x, 0, transform.position.z);
+            var twoDCoord2 = new Vector3(pos.x, 0, pos.z);
+            if ((twoDCoord1 - twoDCoord2).magnitude < 0.1f)
+                Fall();
+        }
+
         transform.position =
             Vector3.Lerp(
                 transform.position,
@@ -207,7 +230,7 @@ public class Sausage : MonoBehaviour
                 currentLerpSpeed);
         var temp = currentAngle;
         currentAngle = Mathf.Lerp(currentAngle, angle, currentLerpSpeed);
-        if (Mathf.Abs(currentAngle - angle) > 0.1f)
+        if (Mathf.Abs(currentAngle - angle) > 0.25f)
         {
             transform.Rotate(axis, temp - currentAngle);
         }
@@ -216,12 +239,36 @@ public class Sausage : MonoBehaviour
     public void Fall()
     {
         _fall = true;
-        currentLerpSpeed = fallSpeed;
+        if (_sinking)
+            currentLerpSpeed = sinkSpeed;
+        else
+            currentLerpSpeed = fallSpeed;
     }
+
+    public void Sink()
+    {
+        _sinking = true;
+    }
+
 
     public void Rise()
     {
+        _sinking = false;
         _fall = false;
         currentLerpSpeed = lerpSpeed;
+    }
+
+    public bool Cooked()
+    {
+        return s1.GetComponent<Burn>().Cooked() && s2.GetComponent<Burn>().Cooked() &&
+               s4.GetComponent<Burn>().Cooked() && s3.GetComponent<Burn>().Cooked();
+    }
+
+    public void Remove()
+    {
+        Instantiate(sausageExplode, transform.position, Quaternion.identity);
+        IsNotDestroyed = false;
+        Debug.Log("destroying");
+        Destroy(gameObject);
     }
 }
