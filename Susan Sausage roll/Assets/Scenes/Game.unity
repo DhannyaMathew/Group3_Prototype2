@@ -250,6 +250,7 @@ GameObject:
   - component: {fileID: 448439658}
   - component: {fileID: 448439657}
   - component: {fileID: 448439661}
+  - component: {fileID: 448439662}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -352,6 +353,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PauseScreen: {fileID: 781998613}
   Lose: {fileID: 311231584}
+--- !u!225 &448439662
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448439656}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &592795817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1143,7 +1156,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 940033805}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.266, z: 0}
+  m_LocalPosition: {x: 73.7, y: 0, z: -73.2}
   m_LocalScale: {x: 50, y: 1, z: 50}
   m_Children: []
   m_Father: {fileID: 0}
