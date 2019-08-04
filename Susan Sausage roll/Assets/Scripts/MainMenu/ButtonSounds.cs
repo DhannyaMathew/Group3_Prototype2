@@ -16,12 +16,15 @@ public class ButtonSounds : MonoBehaviour, ISelectHandler, IPointerEnterHandler
     {
         SoundController.instance.RandomPitchandsfx(0,buttonHover);
     }
+
     //do this whene UI is selected
     public void OnSelect(BaseEventData eventData)
     {
         if (buttonClick != null)
         {
-            SoundController.instance.RandomPitchandsfx(1,buttonClick);
+            SoundController.instance.RandomPitchandsfx(1, buttonClick);
         }
     }
+
+    //There needs to be one for when the UI is pressed to call on submit
 }

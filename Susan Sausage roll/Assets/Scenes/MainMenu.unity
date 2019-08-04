@@ -1203,6 +1203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 437996775}
   - component: {fileID: 437996777}
+  - component: {fileID: 437996776}
   m_Layer: 5
   m_Name: Settings Menu
   m_TagString: Untagged
@@ -1231,6 +1232,22 @@ RectTransform:
   m_AnchoredPosition: {x: -2.7999878, y: -33.899918}
   m_SizeDelta: {x: -267.8, y: -95.2}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &437996776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437996774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 651bdca5457c9804d9162f3f415d369a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MenuSystem: {fileID: 966536994}
+  Menu:
+  - {fileID: 544088515}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!222 &437996777
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1454,7 +1471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &544088518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1468,9 +1485,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 544088518}
+    m_SelectOnDown: {fileID: 544088518}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -1486,7 +1503,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -6866,6 +6883,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 693281506}
+  - component: {fileID: 693281507}
   m_Layer: 0
   m_Name: Credits Menu
   m_TagString: Untagged
@@ -6888,6 +6906,22 @@ Transform:
   m_Father: {fileID: 1857458984}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &693281507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 693281505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 651bdca5457c9804d9162f3f415d369a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MenuSystem: {fileID: 966536994}
+  Menu:
+  - {fileID: 1543705927}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!1 &727215755
 GameObject:
   m_ObjectHideFlags: 0
@@ -6901,6 +6935,7 @@ GameObject:
   - component: {fileID: 727215759}
   - component: {fileID: 727215758}
   - component: {fileID: 727215757}
+  - component: {fileID: 727215761}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -6941,7 +6976,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &727215758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6955,9 +6990,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 1881841798}
+    m_SelectOnDown: {fileID: 1339845666}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -6973,7 +7008,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -7036,6 +7071,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 727215755}
   m_CullTransparentMesh: 0
+--- !u!114 &727215761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727215755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 15
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 865888468}
+          m_MethodName: Submitted
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!1 &760601214
 GameObject:
   m_ObjectHideFlags: 0
@@ -7253,6 +7318,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 865888469}
+  - component: {fileID: 865888468}
   m_Layer: 0
   m_Name: Main Menu
   m_TagString: Untagged
@@ -7260,6 +7326,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &865888468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 865888467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 651bdca5457c9804d9162f3f415d369a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MenuSystem: {fileID: 966536994}
+  Menu:
+  - {fileID: 1339845663}
+  - {fileID: 1496973984}
+  - {fileID: 1881841795}
+  - {fileID: 727215755}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!4 &865888469
 Transform:
   m_ObjectHideFlags: 0
@@ -8144,6 +8229,7 @@ GameObject:
   - component: {fileID: 1339845667}
   - component: {fileID: 1339845666}
   - component: {fileID: 1339845665}
+  - component: {fileID: 1339845669}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -8184,7 +8270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &1339845666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8198,9 +8284,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 727215758}
+    m_SelectOnDown: {fileID: 1496973987}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -8216,7 +8302,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -8290,6 +8376,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339845663}
   m_CullTransparentMesh: 0
+--- !u!114 &1339845669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339845663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 15
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 865888468}
+          m_MethodName: Submitted
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!1 &1361253399
 GameObject:
   m_ObjectHideFlags: 0
@@ -8850,6 +8966,7 @@ GameObject:
   - component: {fileID: 1496973988}
   - component: {fileID: 1496973987}
   - component: {fileID: 1496973986}
+  - component: {fileID: 1496973990}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -8890,7 +9007,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &1496973987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8904,9 +9021,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 1339845666}
+    m_SelectOnDown: {fileID: 1881841798}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -8922,7 +9039,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -9007,6 +9124,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1496973984}
   m_CullTransparentMesh: 0
+--- !u!114 &1496973990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496973984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 15
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 865888468}
+          m_MethodName: Submitted
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!1 &1525979377
 GameObject:
   m_ObjectHideFlags: 0
@@ -9302,7 +9449,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &1543705930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9334,7 +9481,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -10323,6 +10470,7 @@ GameObject:
   - component: {fileID: 1881841796}
   - component: {fileID: 1881841800}
   - component: {fileID: 1881841799}
+  - component: {fileID: 1881841801}
   - component: {fileID: 1881841798}
   - component: {fileID: 1881841797}
   m_Layer: 5
@@ -10365,7 +10513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonHover: {fileID: 8300000, guid: f7e2e1fa6a856ec46921dec9c68cc50d, type: 3}
-  buttonClick: {fileID: 8300000, guid: b0563d66cb4a8fb4bb4bf2e4e7f58839, type: 3}
+  buttonClick: {fileID: 8300000, guid: 27b847f4f5361a64785556706ad7dddc, type: 3}
 --- !u!114 &1881841798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10379,9 +10527,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 1496973987}
+    m_SelectOnDown: {fileID: 727215758}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -10397,7 +10545,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62,
       type: 3}
     m_PressedSprite: {fileID: 21300000, guid: 5c5f17b1d3e9e91479973bfc325e4a13, type: 3}
-    m_SelectedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 21300000, guid: 9742488122e583942b280a159a126e62, type: 3}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -10482,6 +10630,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1881841795}
   m_CullTransparentMesh: 0
+--- !u!114 &1881841801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881841795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 15
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 865888468}
+          m_MethodName: Submitted
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!1 &1894667348
 GameObject:
   m_ObjectHideFlags: 0
