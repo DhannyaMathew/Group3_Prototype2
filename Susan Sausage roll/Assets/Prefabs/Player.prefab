@@ -48,6 +48,7 @@ MonoBehaviour:
   moveDelay: 0.125
   lerpSpeed: 0.4
   burnt: {fileID: 8300000, guid: c96371942755f144a9306b9afd62de04, type: 3}
+  whoosh: {fileID: 8300000, guid: 4aad959cd906ee546bbc6e11923319be, type: 3}
 --- !u!82 &-3185253570354068269
 AudioSource:
   m_ObjectHideFlags: 0

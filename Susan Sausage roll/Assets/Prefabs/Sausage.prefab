@@ -75,6 +75,7 @@ MonoBehaviour:
   sausageExplode: {fileID: 6465617554592810853, guid: 475941111cab1cd4fbf8e12b9b2efde0,
     type: 3}
   plopSound: {fileID: 8300000, guid: 47856190bb5c20049aa8bc5e7418d6a1, type: 3}
+  lose: {fileID: 0}
 --- !u!54 &8788238036887887461
 Rigidbody:
   m_ObjectHideFlags: 0

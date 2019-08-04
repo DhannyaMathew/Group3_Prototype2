@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -29,13 +30,24 @@ public class Sausage : MonoBehaviour
             {
                 subActions.Add(new LevelStart.EndLevel(_sausage.Code));
             }
+
+            if (_sausage.Burnt())
+            {
+                _sausage.LoseScreenOn();
+            }
         }
 
         public override void Inverse()
         {
+            if (_sausage.Burnt())
+            {
+                _sausage.LoseScreenOff();
+            }
+
             burn.UndoPiece();
         }
     }
+
 
     public class SausageMoveAction : GameAction
     {
@@ -86,6 +98,7 @@ public class Sausage : MonoBehaviour
             if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
             {
                 _sausage.Sink();
+                _sausage.LoseScreenOn();
             }
 
             if (Level.IsGrill(_sausage.b2))
@@ -106,6 +119,7 @@ public class Sausage : MonoBehaviour
             if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
             {
                 _sausage.Rise();
+                _sausage.LoseScreenOff();
             }
 
             var diff = _dir - _sausage.Dir;
@@ -145,6 +159,7 @@ public class Sausage : MonoBehaviour
     private AudioSource _audioSource;
     private float _timer;
     private bool _plopping;
+    private static GameObject lose;
     public uint Code { get; private set; }
     public Vector2Int Dir => b2 - b1;
 
@@ -169,6 +184,15 @@ public class Sausage : MonoBehaviour
         {
             _timer = _audioSource.clip.length / 4f;
             _audioSource.Play();
+        }
+    }
+
+    private void Awake()
+    {
+        if (lose == null)
+        {
+            lose = GameObject.FindGameObjectWithTag("LoseMenu");
+            lose.SetActive(false);
         }
     }
 
@@ -267,6 +291,16 @@ public class Sausage : MonoBehaviour
             currentLerpSpeed = fallSpeed;
     }
 
+    private void LoseScreenOn()
+    {
+        lose.SetActive(true);
+    }
+
+    private void LoseScreenOff()
+    {
+        lose.SetActive(false);
+    }
+
     public void Sink()
     {
         if (!_fall)
@@ -291,6 +325,12 @@ public class Sausage : MonoBehaviour
     {
         return s1.GetComponent<Burn>().Cooked() && s2.GetComponent<Burn>().Cooked() &&
                s4.GetComponent<Burn>().Cooked() && s3.GetComponent<Burn>().Cooked();
+    }
+
+    private bool Burnt()
+    {
+        return s1.GetComponent<Burn>().Burnt() || s2.GetComponent<Burn>().Burnt() ||
+               s4.GetComponent<Burn>().Burnt() || s3.GetComponent<Burn>().Burnt();
     }
 
     public void Remove()

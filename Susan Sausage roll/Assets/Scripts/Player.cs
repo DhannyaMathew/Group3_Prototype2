@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
         {
             var prevDir = _player._direction;
             _player._direction += _change;
-
+            _player.PlayWhoosh();
             var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
             if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
             {
@@ -147,14 +147,17 @@ public class Player : MonoBehaviour
             {
                 subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
-
-           
         }
 
         public override void Inverse()
         {
             _player.Move(!_forward, true);
         }
+    }
+
+    private void PlayWhoosh()
+    {
+        _audioSource.PlayOneShot(whoosh, 0.5f);
     }
 
     private void GetBurnt(bool inverse, bool isUndo)
@@ -168,8 +171,9 @@ public class Player : MonoBehaviour
     public float moveDelay = 0.25f;
     public float lerpSpeed;
     public AudioClip burnt;
+    public AudioClip whoosh;
     private AudioSource _audioSource;
-   
+
     private Vector2Int _position;
     private Vector2Int _direction;
     private float _timer;
