@@ -201,6 +201,7 @@ public class Level : MonoBehaviour
         {
             Undo();
         }
+
     }
 
     public static void CompleteLevel(uint level)
@@ -463,7 +464,6 @@ public abstract class GameAction
             {
                 if (!Level.stackOverride)
                 {
-
                     Level.Actions.Push(this);
                 }
                 else

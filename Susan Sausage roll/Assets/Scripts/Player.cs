@@ -20,24 +20,24 @@ public class Player : MonoBehaviour
         {
             if (LevelStart.aLevelStarted == 0)
             {
-                var prevDir = _player._direction;
-                _player._direction += _change;
-                var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
+                var prevDir = _player.Direction;
+                _player.Direction += _change;
+                var sausage = Level.CheckForSausage(_player.Position + prevDir + _player.Direction);
                 if (sausage != null)
                 {
-                    _player._direction -= _change;
+                    _player.Direction -= _change;
                     return false;
                 }
 
                 var temp = sausage;
-                sausage = Level.CheckForSausage(_player._position + _player._direction);
+                sausage = Level.CheckForSausage(_player.Position + _player.Direction);
                 if (sausage != temp && sausage != null)
                 {
-                    _player._direction -= _change;
+                    _player.Direction -= _change;
                     return false;
                 }
 
-                _player._direction -= _change;
+                _player.Direction -= _change;
             }
 
             return true;
@@ -45,32 +45,35 @@ public class Player : MonoBehaviour
 
         protected override void Perform()
         {
-            var prevDir = _player._direction;
-            _player._direction += _change;
+            var prevDir = _player.Direction;
+            _player.Direction += _change;
             _player.PlayWhoosh();
-            var sausage = Level.CheckForSausage(_player._position + prevDir + _player._direction);
+            var sausage = Level.CheckForSausage(_player.Position + prevDir + _player.Direction);
             if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
             {
-                subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
+                subActions.Add(new Sausage.SausageMoveAction(sausage, _player.Direction));
             }
 
             var temp = sausage;
-            sausage = Level.CheckForSausage(_player._position + _player._direction);
+            sausage = Level.CheckForSausage(_player.Position + _player.Direction);
             if (sausage != temp && sausage != null && sausage.Code == LevelStart.aLevelStarted)
             {
                 subActions.Add(new Sausage.SausageMoveAction(sausage, prevDir * -1));
             }
 
-            var level = Level.CheckForLevelStart(_player._position, _player._direction);
+            var level = Level.CheckForLevelStart(_player.Position, _player.Direction);
             if (level != null)
             {
                 subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
+
+            Actions++;
         }
 
         public override void Inverse()
         {
-            _player._direction -= _change;
+            _player.Direction -= _change;
+            Actions--;
         }
 
         public override string ToString()
@@ -97,7 +100,7 @@ public class Player : MonoBehaviour
             {
                 if (_forward)
                 {
-                    var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
+                    var sausage = Level.CheckForSausage(_player.Position + _player.Direction * 2);
                     if (sausage != null)
                     {
                         return false;
@@ -105,7 +108,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    var sausage = Level.CheckForSausage(_player._position - _player._direction);
+                    var sausage = Level.CheckForSausage(_player.Position - _player.Direction);
                     if (sausage != null)
                     {
                         return false;
@@ -113,7 +116,7 @@ public class Player : MonoBehaviour
                 }
             }
 
-            var val = Level.IsWalkable(_player._position + _player._direction * (_forward ? 1 : -1));
+            var val = Level.IsWalkable(_player.Position + _player.Direction * (_forward ? 1 : -1));
             return val;
         }
 
@@ -126,32 +129,35 @@ public class Player : MonoBehaviour
         {
             if (_forward)
             {
-                var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
+                var sausage = Level.CheckForSausage(_player.Position + _player.Direction * 2);
                 if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
                 {
-                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction));
+                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player.Direction));
                 }
             }
             else
             {
-                var sausage = Level.CheckForSausage(_player._position - _player._direction);
+                var sausage = Level.CheckForSausage(_player.Position - _player.Direction);
                 if (sausage != null && sausage.Code == LevelStart.aLevelStarted)
                 {
-                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player._direction * -1));
+                    subActions.Add(new Sausage.SausageMoveAction(sausage, _player.Direction * -1));
                 }
             }
 
             _player.Move(_forward);
-            var level = Level.CheckForLevelStart(_player._position, _player._direction);
+            var level = Level.CheckForLevelStart(_player.Position, _player.Direction);
             if (level != null)
             {
                 subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
+
+            Actions++;
         }
 
         public override void Inverse()
         {
             _player.Move(!_forward, true);
+            Actions--;
         }
     }
 
@@ -172,10 +178,11 @@ public class Player : MonoBehaviour
     public float lerpSpeed;
     public AudioClip burnt;
     public AudioClip whoosh;
+    public static int Actions;
     private AudioSource _audioSource;
 
-    private Vector2Int _position;
-    private Vector2Int _direction;
+    public Vector2Int Position { get; private set; }
+    public Vector2Int Direction { get; private set; }
     private float _timer;
     private bool _onGrill = false;
     private bool _inverse = false;
@@ -185,9 +192,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        _direction = Vector2Int.up;
+        Direction = Vector2Int.up;
         Camera.main.gameObject.GetComponent<FollowPlayer>().player = transform;
-        _position = Level.GetPlayerSpawn();
+        Position = Level.GetPlayerSpawn();
         _animator = GetComponentInChildren<Animator>();
         _audioSource = GetComponent<AudioSource>();
     }
@@ -211,7 +218,7 @@ public class Player : MonoBehaviour
 
     private void CalculateMove(Vector2Int input)
     {
-        var diff = input - _direction;
+        var diff = input - Direction;
         if (diff.Equals(Vector2Int.zero))
             new MoveAction(this, true).Execute();
         else if (diff.x != 0 && diff.y != 0)
@@ -223,10 +230,10 @@ public class Player : MonoBehaviour
 
     public void Move(bool forward, bool isUndo = false)
     {
-        _position += _direction * (forward ? 1 : -1);
-        Level.GetFloor(_position).PlaySound();
+        Position += Direction * (forward ? 1 : -1);
+        Level.GetFloor(Position).PlaySound();
         _animator.SetFloat(Walk, forward ? 1f : -1f);
-        if (Level.IsGrill(_position))
+        if (Level.IsGrill(Position))
         {
             GetBurnt(!forward, isUndo);
         }
@@ -235,7 +242,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        var pos = new Vector3(_position.x, transform.position.y, _position.y);
+        var pos = new Vector3(Position.x, transform.position.y, Position.y);
         if ((transform.position - pos).magnitude > 0.05f)
         {
             transform.position =
@@ -264,7 +271,7 @@ public class Player : MonoBehaviour
             _animator.SetFloat(Walk, 0f);
         }
 
-        var rot = Quaternion.LookRotation(new Vector3(_direction.x, 0, _direction.y));
+        var rot = Quaternion.LookRotation(new Vector3(Direction.x, 0, Direction.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, lerpSpeed);
     }
 }

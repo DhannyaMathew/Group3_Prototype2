@@ -50,6 +50,7 @@ public class LevelStart : MonoBehaviour
         {
             if (aLevelStarted == 0)
             {
+                Player.Actions = 0;
                 Level.DropAllExcludingMask(ls.Code);
                 aLevelStarted = ls.Code;
             }

@@ -95,7 +95,7 @@ public class Sausage : MonoBehaviour
                 _sausage.Move(_dir);
             }
 
-            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
+            if (_sausage.MustFall())
             {
                 _sausage.Sink();
                 _sausage.LoseScreenOn();
@@ -116,7 +116,7 @@ public class Sausage : MonoBehaviour
 
         public override void Inverse()
         {
-            if (!Level.IsWalkable(_sausage.b1) && !Level.IsWalkable(_sausage.b2))
+            if (_sausage.MustFall())
             {
                 _sausage.Rise();
                 _sausage.LoseScreenOff();
@@ -134,12 +134,18 @@ public class Sausage : MonoBehaviour
         }
     }
 
+    private bool MustFall()
+    {
+        return !Level.IsWalkable(b1) && !Level.IsWalkable(b2);
+    }
+
     public float lerpSpeed = 1.25f;
     private bool _fall;
-    private Vector2Int b1;
-    private Vector2Int b2;
+    public Vector2Int b1;
+    public Vector2Int b2;
     private float currentLerpSpeed;
-
+    
+    
     public Vector3 Position => new Vector3(
         (b1.x + b2.x) / 2f, _fall ? -0.6f : 1.5f, (b1.y + b2.y) / 2f);
 
