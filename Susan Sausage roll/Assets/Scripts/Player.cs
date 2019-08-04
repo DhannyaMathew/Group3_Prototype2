@@ -39,6 +39,7 @@ public class Player : MonoBehaviour
 
                 _player._direction -= _change;
             }
+
             return true;
         }
 
@@ -93,7 +94,6 @@ public class Player : MonoBehaviour
         {
             if (LevelStart.aLevelStarted == 0)
             {
-              
                 if (_forward)
                 {
                     var sausage = Level.CheckForSausage(_player._position + _player._direction * 2);
@@ -146,7 +146,6 @@ public class Player : MonoBehaviour
             {
                 subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
-            
         }
 
         public override void Inverse()
@@ -171,12 +170,15 @@ public class Player : MonoBehaviour
     private bool _onGrill = false;
     private bool _inverse = false;
     private bool _isUndo = false;
+    private Animator _animator;
+    private static readonly int Walk = Animator.StringToHash("Direction");
 
     private void Start()
     {
         _direction = Vector2Int.up;
         Camera.main.gameObject.GetComponent<FollowPlayer>().player = transform;
         _position = Level.GetPlayerSpawn();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     private void Update()
@@ -211,6 +213,7 @@ public class Player : MonoBehaviour
     public void Move(bool forward, bool isUndo = false)
     {
         _position += _direction * (forward ? 1 : -1);
+        _animator.SetFloat(Walk, forward ? 1f : -1f);
         if (Level.IsGrill(_position))
         {
             GetBurnt(!forward, isUndo);
@@ -221,7 +224,7 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         var pos = new Vector3(_position.x, transform.position.y, _position.y);
-        if (!transform.position.Equals(pos))
+        if ((transform.position - pos).magnitude > 0.05f)
         {
             transform.position =
                 Vector3.Lerp(
@@ -243,6 +246,10 @@ public class Player : MonoBehaviour
                     }
                 }
             }
+        }
+        else
+        {
+            _animator.SetFloat(Walk, 0f);
         }
 
         var rot = Quaternion.LookRotation(new Vector3(_direction.x, 0, _direction.y));
