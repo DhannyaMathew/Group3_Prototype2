@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public class Level : MonoBehaviour
@@ -30,6 +31,8 @@ public class Level : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject sausagePrefab;
     public GameObject levelStartPrefab;
+    public GameObject[] flowers;
+    public float flowersSpawnChance = 0.2f;
     private static Level _instance;
     public Vector2Int playerSpawn;
 
@@ -75,18 +78,22 @@ public class Level : MonoBehaviour
             {
                 var s = new Vector2Int(x, y);
                 var block = GetBlock(s);
+                var pos = new Vector3(x, 0.5f, y);
                 var entity = GetEntitiy(s);
                 GameObject floor = null;
                 switch (block)
                 {
                     case Floor1:
-                        floor = Instantiate(floor1Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        floor = Instantiate(floor1Piece, pos, Quaternion.identity);
+                        TrySpawnFlowers(floor.transform,pos);
                         break;
                     case Floor2:
                         floor = Instantiate(floor2Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        TrySpawnFlowers(floor.transform, pos);
                         break;
                     case Floor3:
                         floor = Instantiate(floor3Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
+                        TrySpawnFlowers(floor.transform,pos);
                         break;
                     case Floor4:
                         floor = Instantiate(floor4Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
@@ -178,6 +185,16 @@ public class Level : MonoBehaviour
         Instantiate(playerPrefab, new Vector3(playerSpawn.x, 1f, playerSpawn.y), Quaternion.identity);
     }
 
+    private void TrySpawnFlowers(Transform parent, Vector3 pos)
+    {
+        if (Random.Range(0, 1f) < flowersSpawnChance)
+        {
+            var obj = Instantiate(flowers[Random.Range(0, flowers.Length)], parent);
+            obj.transform.position = pos;
+            obj.transform.rotation = Quaternion.Euler(0, Random.Range(0, 4) * 90, 0);
+        }
+    }
+
     private void Update()
     {
         if (Input.GetButtonDown("Undo"))
@@ -218,7 +235,7 @@ public class Level : MonoBehaviour
         return _walkables.Contains(GetBlock(coord)) && !floor.drop;
     }
 
-    private static Floor GetFloor(Vector2Int coord)
+    public static Floor GetFloor(Vector2Int coord)
     {
         foreach (var floor in _floors)
         {
@@ -258,6 +275,7 @@ public class Level : MonoBehaviour
                 return grill.IsOn;
             }
         }
+
         return false;
     }
 
@@ -270,6 +288,7 @@ public class Level : MonoBehaviour
                 return sausage;
             }
         }
+
         return null;
     }
 

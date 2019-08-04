@@ -90,6 +90,7 @@ public class Player : MonoBehaviour
             _player = player;
         }
 
+
         protected override bool CanPerform()
         {
             if (LevelStart.aLevelStarted == 0)
@@ -146,6 +147,8 @@ public class Player : MonoBehaviour
             {
                 subActions.Add(new LevelStart.PlayerEnterAction(level));
             }
+
+           
         }
 
         public override void Inverse()
@@ -159,11 +162,14 @@ public class Player : MonoBehaviour
         _onGrill = true;
         _inverse = inverse;
         _isUndo = isUndo;
+        _audioSource.PlayOneShot(burnt);
     }
 
     public float moveDelay = 0.25f;
     public float lerpSpeed;
-
+    public AudioClip burnt;
+    private AudioSource _audioSource;
+   
     private Vector2Int _position;
     private Vector2Int _direction;
     private float _timer;
@@ -179,6 +185,7 @@ public class Player : MonoBehaviour
         Camera.main.gameObject.GetComponent<FollowPlayer>().player = transform;
         _position = Level.GetPlayerSpawn();
         _animator = GetComponentInChildren<Animator>();
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -213,6 +220,7 @@ public class Player : MonoBehaviour
     public void Move(bool forward, bool isUndo = false)
     {
         _position += _direction * (forward ? 1 : -1);
+        Level.GetFloor(_position).PlaySound();
         _animator.SetFloat(Walk, forward ? 1f : -1f);
         if (Level.IsGrill(_position))
         {

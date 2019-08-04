@@ -23,6 +23,7 @@ public class Sausage : MonoBehaviour
 
         protected override void Perform()
         {
+            _sausage.PlaySound();
             burn.BurnPiece();
             if (Level.AllSausagesCooked(LevelStart.aLevelStarted))
             {
@@ -139,6 +140,11 @@ public class Sausage : MonoBehaviour
     public GameObject s3;
     public GameObject s4;
     public GameObject sausageExplode;
+    public AudioClip plopSound;
+
+    private AudioSource _audioSource;
+    private float _timer;
+    private bool _plopping;
     public uint Code { get; private set; }
     public Vector2Int Dir => b2 - b1;
 
@@ -157,9 +163,19 @@ public class Sausage : MonoBehaviour
 
     public bool IsNotDestroyed { get; private set; }
 
+    private void PlaySound()
+    {
+        if (!_fall)
+        {
+            _timer = _audioSource.clip.length / 4f;
+            _audioSource.Play();
+        }
+    }
+
     private void Start()
     {
         currentLerpSpeed = lerpSpeed;
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Move(Vector2Int dir)
@@ -234,6 +250,12 @@ public class Sausage : MonoBehaviour
         {
             transform.Rotate(axis, temp - currentAngle);
         }
+
+        _timer -= Time.fixedDeltaTime;
+        if (_timer <= 0 && _audioSource.isPlaying && !_plopping)
+        {
+            _audioSource.Stop();
+        }
     }
 
     public void Fall()
@@ -247,12 +269,19 @@ public class Sausage : MonoBehaviour
 
     public void Sink()
     {
+        if (!_fall)
+        {
+            _plopping = true;
+            _audioSource.PlayOneShot(plopSound);
+        }
+
         _sinking = true;
     }
 
 
     public void Rise()
     {
+        _plopping = false;
         _sinking = false;
         _fall = false;
         currentLerpSpeed = lerpSpeed;
@@ -268,7 +297,6 @@ public class Sausage : MonoBehaviour
     {
         Instantiate(sausageExplode, transform.position, Quaternion.identity);
         IsNotDestroyed = false;
-        Debug.Log("destroying");
         Destroy(gameObject);
     }
 }

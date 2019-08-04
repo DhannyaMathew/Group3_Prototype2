@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Grill : MonoBehaviour
 {
-
     public Material offMat;
     public Material onMat;
-    
+    public AudioClip on, off;
     public bool IsOn { get; private set; }
 
     public void TurnOn()
@@ -20,5 +19,10 @@ public class Grill : MonoBehaviour
     {
         IsOn = false;
         GetComponentInChildren<Renderer>().material = offMat;
+    }
+
+    public AudioClip Sound()
+    {
+        return IsOn ? on : off;
     }
 }
