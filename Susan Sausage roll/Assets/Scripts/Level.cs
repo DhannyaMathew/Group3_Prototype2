@@ -85,7 +85,7 @@ public class Level : MonoBehaviour
                 {
                     case Floor1:
                         floor = Instantiate(floor1Piece, pos, Quaternion.identity);
-                        TrySpawnFlowers(floor.transform,pos);
+                        TrySpawnFlowers(floor.transform, pos);
                         break;
                     case Floor2:
                         floor = Instantiate(floor2Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
@@ -93,7 +93,7 @@ public class Level : MonoBehaviour
                         break;
                     case Floor3:
                         floor = Instantiate(floor3Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
-                        TrySpawnFlowers(floor.transform,pos);
+                        TrySpawnFlowers(floor.transform, pos);
                         break;
                     case Floor4:
                         floor = Instantiate(floor4Piece, new Vector3(x, 0.5f, y), Quaternion.identity);
@@ -211,9 +211,10 @@ public class Level : MonoBehaviour
             if (sausage.Code == level)
             {
                 sausage.Remove();
-                //  _sausages.Remove(sausage);
             }
         }
+
+        ClearActionStack();
     }
 
     public static void Undo()
@@ -386,8 +387,11 @@ public class Level : MonoBehaviour
         }
     }
 
+    public static bool stackOverride = false;
+
     public static void ClearActionStack()
     {
+        stackOverride = true;
         Actions.Clear();
     }
 
@@ -456,7 +460,17 @@ public abstract class GameAction
             }
 
             if (push)
-                Level.Actions.Push(this);
+            {
+                if (!Level.stackOverride)
+                {
+
+                    Level.Actions.Push(this);
+                }
+                else
+                {
+                    Level.stackOverride = false;
+                }
+            }
         }
     }
 }
